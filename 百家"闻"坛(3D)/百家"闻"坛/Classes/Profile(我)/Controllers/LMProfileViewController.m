@@ -10,6 +10,8 @@
 #import "LMBaseSetting.h"
 #import "LMProfileCell.h"
 #import "Masonry.h"
+#import "LMLikeTableViewController.h"
+#import "LMNavigationController.h"
 
 @interface LMProfileViewController ()
 
@@ -130,6 +132,7 @@
         [likeButton setImage:[UIImage imageNamed:@"user_favor_icon"] forState:UIControlStateNormal];
         likeButton.backgroundColor = [UIColor whiteColor];
         [likeButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+        [likeButton addTarget:self action:@selector(likeButtonClick) forControlEvents:UIControlEventTouchUpInside];
         [likeButton setTitle:@"收藏" forState:UIControlStateNormal];
         [headerView addSubview:likeButton];
         //跟帖按钮
@@ -183,6 +186,14 @@
     }else{
         return nil;
     }
+}
+
+- (void) likeButtonClick {
+    LMLikeTableViewController *likeVC = [[LMLikeTableViewController alloc]init];
+    LMNavigationController *nav = [[LMNavigationController alloc]initWithRootViewController:likeVC];
+    [self presentViewController:nav animated:YES completion:^{
+        
+    }];
 }
 
 @end

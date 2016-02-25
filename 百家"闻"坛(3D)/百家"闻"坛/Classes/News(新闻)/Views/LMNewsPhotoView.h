@@ -7,8 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "LMNews.h"
 
 @interface LMNewsPhotoView : UIView
+
+@property (nonatomic,strong) LMNews *news;
 
 @property (nonatomic,strong) UIScrollView *photoScrollView;
 @property (nonatomic,strong) UILabel *titleLabel;

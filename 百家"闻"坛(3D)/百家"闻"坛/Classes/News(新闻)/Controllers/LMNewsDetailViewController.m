@@ -12,12 +12,17 @@
 #import "LMDetailImage.h"
 #import "LMReplyViewController.h"
 #import "LMReplyTool.h"
+#import "Masonry.h"
+#import "LMDataBaseTool.h"
 
 @interface LMNewsDetailViewController ()
 
 @property (nonatomic,strong) UIWebView *detailWebView;
 @property (nonatomic,strong) LMDetailNews *detailNews;
 @property (nonatomic,weak) UIButton *replyButton;
+@property (nonatomic,strong) UIButton *likeButton;
+
+@property (nonatomic,strong) FMDatabase *db;
 
 @end
 
@@ -37,6 +42,8 @@
     [self addWebView];
     //请求新闻网络数据
     [self requestDataFromSever];
+    //添加收藏按钮
+    [self addLikeButton];
 
 }
 
@@ -79,6 +86,7 @@
 }
 
 - (void)backBtnClick {
+    [self.likeButton removeFromSuperview];
     [self.navigationController popViewControllerAnimated:YES];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     
@@ -159,5 +167,53 @@
     }
     return body;
 }
+
+- (void)addLikeButton {
+    UIButton *likeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.likeButton = likeButton;
+    [likeButton setImage:[UIImage imageNamed:@"user_set_icon_message"] forState:UIControlStateNormal];
+    [likeButton addTarget:self action:@selector(likeButtonClick) forControlEvents:UIControlEventTouchUpInside];
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    [window addSubview:likeButton];
+    [likeButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.equalTo(window).offset(-10);
+        make.bottom.equalTo(window).offset(-10);
+        make.width.height.equalTo(@35);
+    }];
+}
+
+- (void)likeButtonClick {
+    NSString *doc = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *fileName = [doc stringByAppendingPathComponent:@"news.sqlite"];
+    
+    //2.获得数据库
+    FMDatabase *db=[FMDatabase databaseWithPath:fileName];
+    //3.打开数据库
+    if ([db open])
+    {
+        //4.创表
+        BOOL result=[db executeUpdate:@"CREATE TABLE IF NOT EXISTS news (title text PRIMARY KEY NOT NULL, url text NOT NULL);"];
+        if (result)
+        {
+            NSLog(@"创表成功");
+            
+        }
+        else
+        {
+            NSLog(@"创表失败");
+        }
+    }
+    self.db = db;
+    
+    [self.db executeUpdate:@"INSERT INTO news (title, url) VALUES (?, ?);", self.news.title, self.news.imgsrc];
+    
+    
+    FMResultSet *resultSet = [self.db executeQuery:@"SELECT * FROM news"];
+
+    [resultSet close];
+    [db close];
+}
+
+
 
 @end

@@ -93,6 +93,7 @@
     
     [LMPhotoTool photoFromSeverWithUrlString:urlString success:^(LMNewsPhoto *photo) {
         self.photo = photo;
+        self.photoView.news = self.news;
         [self setUpPhotoView];
     } failure:^(NSError *error) {
         
